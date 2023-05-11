@@ -1,5 +1,7 @@
-# Groupe 11.21
-# But : trouver une résistance optimale pour avoir une différence de tension la plus importante possible
+# 
+# Programme pour trouver une résistance optimale pour avoir une différence de tension la plus importante possible
+# Groupe 11.21 FSA11BA LEPL1502 2022-2023
+#
 
 import numpy as np
 import matplotlib.pyplot as plt
