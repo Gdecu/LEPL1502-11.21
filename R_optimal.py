@@ -1,6 +1,6 @@
 # 
-# Programme pour trouver une résistance optimale pour avoir une différence de tension la plus importante possible
-# Groupe 11.21 FSA11BA LEPL1502 2022-2023
+# Programme pour trouver une résistance optimale pour avoir une différence de tension la plus importante possible pour le cours LEPL1502
+# Groupe 11.21 FSA11BA 2022-2023
 #
 
 import numpy as np
