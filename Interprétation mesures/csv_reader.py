@@ -27,11 +27,7 @@ def get_data(filename_csv):
                     continue
         (Time_titel, t) = get_title(Time);    (Canal_A_titel, A) = get_title(Canal_A);    (Canal_B_titel, B) = get_title(Canal_B)
         transform_to_float(t, 8);    transform_to_float(A, 8);    transform_to_float(B, 8)
-    return ([Time_titel, Canal_A_titel, Canal_B_titel], [np.array(t), np.array(A), np.array(B)])
-
-def calibre(data):
-    pass
-    
+    return ([Time_titel, Canal_A_titel, Canal_B_titel], [np.array(t), np.array(A), np.array(B)])    
 
 def data_moy (Value):
     '''
