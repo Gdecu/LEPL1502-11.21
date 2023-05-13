@@ -85,4 +85,3 @@ def graph (Title, Value):
     ax.set_xlabel('Temps [µs]')
     ax.set_ylabel('Tensions [V]')
     plt.show()
-
