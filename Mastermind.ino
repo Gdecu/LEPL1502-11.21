@@ -123,8 +123,6 @@ void loop() {
     }
   }
 
-
-
 bool button1IsPressed(){return digitalRead(BUTTON1);}
 
 bool button2IsPressed(){return digitalRead(BUTTON2);}
