@@ -12,9 +12,9 @@
 #define V_out2 A1 
 #define V_out3 A2
 #define BUTTON1 2
-#define BUTTON2 3
-#define BUTTON3 4
-#define SERVO 5
+#define BUTTON2 4
+#define BUTTON3 7
+#define SERVO 8
 
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 Servo myservo;
@@ -48,11 +48,12 @@ void loop() {
     lcd.clear();                        
     lcd.setCursor(2, 1);  lcd.print("Il vous reste");
     lcd.setCursor(3, 2);  lcd.print(String(attemps) + " essais !");
-    delay(2000);                                                        
-    lcd.setCursor(2, 0);  lcd.print("Essais numéro : " + String(attemps_tot - attemps));
-    lcd.setCursor(3, 1);  lcd.print("Entrer votre code");
-    lcd.setCursor(0, 1);  lcd.print("Appuyez sur 2 pour");
-    lcd.setCursor(2, 1);  lcd.print("validez le choix");
+    delay(2000);
+    lcd.clear();                                                        
+    lcd.setCursor(1, 0);  lcd.print("Essais numéro : " + String(attemps_tot - attemps + 1));
+    lcd.setCursor(1, 1);  lcd.print("Entrer votre code");
+    lcd.setCursor(1, 2);  lcd.print("Appuyez sur 2 pour");
+    lcd.setCursor(2, 3);  lcd.print("validez le choix");
 
     makeChoice(history, attemps);                                       // On attemps que le joueur appuie sur le bouton2 pour valider son essai
 
@@ -123,6 +124,8 @@ void loop() {
     }
   }
 
+
+
 bool button1IsPressed(){return digitalRead(BUTTON1);}
 
 bool button2IsPressed(){return digitalRead(BUTTON2);}
@@ -130,8 +133,10 @@ bool button2IsPressed(){return digitalRead(BUTTON2);}
 void makeChoice(String history, int attemps){
   bool choiceIsMade = false;
   while(!choiceIsMade){
-    if (button1IsPressed()){show_history(history, attemps);}            // Si on appuie bouton1 : l'historique s'affiche et on attend qu'on appuie sur bouton2
-    if (button2IsPressed()){choiceIsMade = true;}                       // Si on appuie bouton2 : le jeu continue 
+    bool button1State = button1IsPressed();
+    bool button2Ismade = button2IsPressed();
+    if (!button1State){show_history(history, attemps);}            // Si on appuie bouton1 : l'historique s'affiche et on attend qu'on appuie sur bouton2
+    if (!button2Ismade){choiceIsMade = true;}                       // Si on appuie bouton2 : le jeu continue 
     }
   }
 
@@ -161,26 +166,31 @@ void show_history(String history, int attemps){                         // On af
   }
 
 String gen_code(){                                                      // Générer aléatoirement le code couleur secret
-  String code; 
+  String code;
   char colors[4] = {'b', 'v', 'j', 'r'};
+  // Mélanger les couleurs dans le tableau
+  for (int i = 3; i > 0; i--) {
+    int j = random(i + 1);
+    char temp = colors[i];
+    colors[i] = colors[j];
+    colors[j] = temp;}
+  // Sélectionner les quatre premières couleurs mélangées
+  for (int i = 0; i < 4; i++) {code += String(colors[i]);}
 
-  for (int i = 0; i < 4; i++) {
-    int j = random(4);
-    code += String(colors[j]);}
+  Serial.println("\nLe code secret est : " + code);
 
-  Serial.println("\nLe code secret est : " + String(code));
+return code;}
 
-  return (code);}
 
 String det_color(){                                                     // On détermine la couleur mise par le joueur
   int a = analogRead(V_out1);
   int b = analogRead(V_out2);
   int c = analogRead(V_out3);
-
-  if (a < 2 && b < 2 && c < 2) {return ("b");}
-  else if (a < 2 && b < 2 && c > 2) {return ("v");}
-  else if (a < 2 && b > 2 && c > 2) {return ("r");} 
-  else if (a > 2 && b > 2 && c > 2) {return ("j");}}
+  Serial.println(String(a)+ "," + String(b) + "," + String(c));
+  if (a < 100 && b < 100 && c < 100) {return ("b");}
+  else if (a < 100 && b < 100 && c > 100) {return ("v");}
+  else if (a < 100 && b > 100 && c > 100) {return ("r");} 
+  else if (a > 100 && b > 100 && c > 100) {return ("j");}}
 
 String player_code(){                                                   // On détermine le code du joueur
   String code;
