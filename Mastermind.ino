@@ -17,11 +17,12 @@
 #define SERVO 8
 
 LiquidCrystal_I2C lcd(0x27, 20, 4);
-Servo myservo;
 
 const int attemps_tot = 12;
 int attemps = attemps_tot;
+
 String history = "";
+Servo myservo;
 
 void setup() {
   Serial.begin(9600);
@@ -42,7 +43,7 @@ void loop() {
   String secret_code; history = "";
   secret_code = gen_code();                                             // On génère le code secret
   attemps = attemps_tot;                                                // On initialise le nbr d'essais
-  myservo.write(90);                                                    // On ferme la trappe
+  myservo.write(180);                                                    // On ferme la trappe
 
   while (attemps > 0){                                                  // Le jeu commence et continue tant que le joueur à encore des essais
     lcd.clear();                        
@@ -50,10 +51,10 @@ void loop() {
     lcd.setCursor(3, 2);  lcd.print(String(attemps) + " essais !");
     delay(2000);
     lcd.clear();                                                        
-    lcd.setCursor(1, 0);  lcd.print("Essais numéro : " + String(attemps_tot - attemps + 1));
+    lcd.setCursor(1, 0);  lcd.print("Essais numero : " + String(attemps_tot - attemps + 1));
     lcd.setCursor(1, 1);  lcd.print("Entrer votre code");
     lcd.setCursor(1, 2);  lcd.print("Appuyez sur 2 pour");
-    lcd.setCursor(2, 3);  lcd.print("validez le choix");
+    lcd.setCursor(2, 3);  lcd.print("Validez le choix");
 
     makeChoice(history, attemps);                                       // On attemps que le joueur appuie sur le bouton2 pour valider son essai
 
@@ -72,8 +73,8 @@ void loop() {
             result[0]++;
             break;}}}}
     
-    Serial.println("Bien placées : " + String(result[1]));
-    Serial.println("Bonne couleurs : " + String(result[0]));
+    Serial.println("Bien placees : " + String(result[1]));
+    Serial.println("Bonnes couleurs : " + String(result[0]));
     
     String strcode = String(code);  history = history + strcode + " ";
     
@@ -81,15 +82,15 @@ void loop() {
       attemps--;                                                        // On enlève un essais et le joueur peut reessayer un coups
       
       Serial.println("Historique : " + String(history));
-      Serial.println("prochain essais");
+      Serial.println("Prochain essais");
       
       lcd.clear();
-      lcd.setCursor(6,0);  lcd.print("RATÉ !");
+      lcd.setCursor(6,0);  lcd.print("RATE !");
       delay(2000);
       
       lcd.clear();
-      lcd.setCursor(1, 1);  lcd.print("Bonne couleurs: " + String(result[0]));
-      lcd.setCursor(2, 2);  lcd.print("Bien placé: " + String(result[1]));
+      lcd.setCursor(1, 1);  lcd.print("Bonnes couleurs: " + String(result[0]));
+      lcd.setCursor(2, 2);  lcd.print("Biens placees: " + String(result[1]));
       delay(2000);
       lcd.clear();
       lcd.setCursor(1, 0);  lcd.print("Appuyez sur 1 pour");
@@ -103,15 +104,19 @@ void loop() {
     else {                                                              // La partie est finie on en recommence une
       if (attemps == 0){
         lcd.clear();
-        lcd.setCursor(1, 1);  lcd.print("Il ne vous reste");
-        lcd.setCursor(1, 2);  lcd.print("plus d'essais !");
+        lcd.setCursor(1, 0);  lcd.print("Il ne vous reste");
+        lcd.setCursor(1, 1);  lcd.print("plus d'essais !");
+        lcd.setCursor(4, 2);  lcd.print("Le code était :");
+        lcd.setCursor(8, 4);  lcd.print(String(secret_code));
         delay(2000);}
 
       else {
         attemps = 0;
         
         lcd.clear();
-        lcd.setCursor(3, 0);  lcd.print("BIEN JOUÉ !");
+        lcd.setCursor(3, 0);  lcd.print("BIEN JOUE !");
+        lcd.setCursor(4, 1);  lcd.print("Le code etait :");
+        lcd.setCursor(8, 2);  lcd.print(String(secret_code));
         delay(2000);}
 
       lcd.clear();
@@ -183,14 +188,20 @@ return code;}
 
 
 String det_color(){                                                     // On détermine la couleur mise par le joueur
-  int a = analogRead(V_out1);
-  int b = analogRead(V_out2);
-  int c = analogRead(V_out3);
-  Serial.println(String(a)+ "," + String(b) + "," + String(c));
-  if (a < 100 && b < 100 && c < 100) {return ("b");}
-  else if (a < 100 && b < 100 && c > 100) {return ("v");}
-  else if (a < 100 && b > 100 && c > 100) {return ("r");} 
-  else if (a > 100 && b > 100 && c > 100) {return ("j");}}
+  int aMoy = 0; int bMoy = 0; int cMoy = 0; int nbr = 20;
+  // On effectue une moyenne des entrées pour pouvoir détecter les entrées dont leurs valeures oscillent
+  for (int i = 0; i < nbr; i++){
+    int a = analogRead(V_out1);
+    int b = analogRead(V_out2);
+    int c = analogRead(V_out3);
+    aMoy += a;  bMoy += b;  cMoy += c;}
+  aMoy = aMoy / nbr ; bMoy = bMoy / nbr; cMoy = cMoy / nbr;
+
+  Serial.println(String(aMoy)+ "," + String(bMoy) + "," + String(cMoy));
+  if (aMoy < 100 && bMoy < 100 && cMoy < 100) {return ("j");}
+  else if (aMoy < 100 && bMoy < 100 && cMoy > 100) {return ("r");}
+  else if (aMoy < 100 && bMoy > 100 && cMoy > 100) {return ("b");} 
+  else if (aMoy > 100 && bMoy > 100 && cMoy > 100) {return ("v");}}
 
 String player_code(){                                                   // On détermine le code du joueur
   String code;
@@ -208,8 +219,9 @@ String player_code(){                                                   // On d�
       bool button3State = digitalRead(BUTTON3);
       if (!button3State){                                               // Lorsque button3 est enfoncé
         button3IsPressed = true;
-        code += det_color();                                            // On détermine la couleur mise par le joueur
-        myservo.write(0);                                               // On tourne la trappe pour que la bille tombe
+        code += det_color(); 
+        Serial.println("Avancé code: "+code);                           // On détermine la couleur mise par le joueur
+        myservo.write(180);                                               // On tourne la trappe pour que la bille tombe
         delay(1000);
         myservo.write(90);
         }}
