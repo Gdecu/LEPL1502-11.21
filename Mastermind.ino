@@ -1,6 +1,7 @@
 //
-// Programme arduino du mastermind pour LEPL 1502
-// Groupe 11.21 FSA11BA 2022-2023
+// Programme arduino du mastermind
+// LEPL 1502
+// Groupe 11.21 FSA11BA 2023
 //
 
 #include <Wire.h>
